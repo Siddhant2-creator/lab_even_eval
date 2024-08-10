@@ -1,42 +1,58 @@
-#include<iostream>
-#include<bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <cmath>
 using namespace std;
-int determinant(vector<vector<int>> vec){
-    int result=vec[0][0]*vec[1][1]-vec[0][1]*vec[1][0];
-    return result;
+
+void getCofactor(vector<vector<int>>& matrix, vector<vector<int>>& temp, int p, int q, int n) {
+    int i = 0, j = 0;
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            if (row != p && col != q) {
+                temp[i][j++] = matrix[row][col];
+                if (j == n - 1) {
+                    j = 0;
+                    i++;
+                }
+            }
+        }
+    }
 }
 
-int main(){
-    int row,col;
-    cout<<"Enter row and col: ";
-    cin>>row>>col;
-    vector<vector<int>> vec;
-    int temp;
-    vector<int> tempArr;
-    for(int i=0;i<row;i++){
-        for(int j=0;j<col;j++){
-            cout<<"Enter number: ";
-            cin>>temp;
-            tempArr.push_back(temp);
+int determinant(vector<vector<int>>& matrix, int n) {
+    if (n == 1)
+        return matrix[0][0];
+    int det = 0;
+    vector<vector<int>> temp(n, vector<int>(n));
+    int sign = 1;
+
+    for (int f = 0; f < n; f++) {
+        getCofactor(matrix, temp, 0, f, n);
+        det += sign * matrix[0][f] * determinant(temp, n - 1);
+        sign = -sign;
+    }
+    return det;
+}
+
+int main() {
+    int n;
+    cout << "Enter the size of the matrix (n x n): ";
+    cin >> n;
+    vector<vector<int>> matrix(n, vector<int>(n));
+    cout << "Enter the elements of the matrix:" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cin >> matrix[i][j];
         }
-        vec.push_back(tempArr);
-        tempArr.clear();
     }
-    for(int i=0;i<row;i++){
-        for(int j=0;j<col;j++){
-            cout<<vec[i][j]<<" ";
+
+    cout << "The entered matrix is:" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << matrix[i][j] << " ";
         }
-        cout<<endl;
+        cout << endl;
     }
-    if(row==2){
-        cout<<"Determinant is : "<<determinant(vec);
-    }
-    if(row==3){
-        vector<vector<int>> v1={{vec[1][1],vec[1][2]},{vec[2][1],vec[2][2]}};
-        vector<vector<int>> v2={{vec[1][0],vec[1][2]},{vec[2][0],vec[2][2]}};
-        vector<vector<int>> v3={{vec[1][1],vec[1][1]},{vec[2][0],vec[2][1]}};
-        int result=vec[0][0]*determinant(v1)-vec[0][1]*determinant(v2)+vec[0][2]*determinant(v3);
-        cout<<"Determinant is : "<<result;
-    }
+    int det = determinant(matrix, n);
+    cout << "Determinant of the matrix is: " << det << endl;
     return 0;
 }
